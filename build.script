@@ -1,0 +1,9 @@
+#!/bin/bash
+
+pyinstaller HoloStreams.spec
+
+mkdir dist/HoloStreams/images/
+mkdir dist/HoloStreams/DATA/
+
+cp images/* dist/HoloStreams/images
+cp members.json dist/HoloStreams/DATA
