@@ -18,7 +18,7 @@ from PyQt5.QtGui import QIcon, QPixmap
 
 class HoloLiveMember():
 
-	devision = "" # Main/ID/Stars/CN
+	branch = "" # main/ID/Stars/CN
 
 	name = ""
 	channel_id = ""
@@ -29,12 +29,13 @@ class HoloLiveMember():
 
 	old_video_id_list = []
 
-	def __init__(self, name, channel_id, devision, isLive,photopath):
+	def __init__(self, name, channel_id, devision, isLive,photopath,branch):
 		self.devision = devision
 		self.channel_id = channel_id
 		self.name = name
 		self.isLive = isLive
 		self.photoPath = photopath
+		self.branch = branch
 		
 	def addElements(self, container,x,y):
 		self.pfplabel = QLabel(container)
@@ -134,11 +135,11 @@ class HoloStream(QMainWindow):
 	def __init__(self):
 		super().__init__()
 
-		self.memberpath = "members.json"
+		self.memberpath = self.resource_path("members.json")
 
 		self.loadMembers()
 
-		self.updateLiveStatus()
+		self.sortby = "main"
 
 		self.initUI()
 
@@ -158,19 +159,41 @@ class HoloStream(QMainWindow):
 		filemenu = menubar.addMenu("File")
 		filemenu.addAction(quitAction)
 		
-		self.setGeometry(640, 640, 820, 480)
+		mainbranchAction = QAction("Main",self)
+		mainbranchAction.setShortcut("Ctrl-m")
+		mainbranchAction.triggered.connect(self.setSortToMain)
+		
+		IDbranchAction = QAction("ID",self)
+		IDbranchAction.setShortcut("Ctrl-i")
+		IDbranchAction.triggered.connect(self.setSortToID)
+		
+		# Will turn into china but I have no way of chekcing the live status yet
+		#mainbranchAction = QAction("Main",self) 
+		#mainbranchAction.setShortcut("Ctrl-m")
+		#mainbranchAction.triggered.connect(self.setSortToMain)
+		
+		holomenu = menubar.addMenu("HoloLive")
+		holomenu.addAction(mainbranchAction)
+		holomenu.addAction(IDbranchAction)
+		
+		self.setGeometry(640, 640, 820, 560)
 		self.setWindowTitle('HoloStreams')    
 
 
 		# Why did this take take so long to make?
+		# But for the waifus at homolive it's worth it... (21:43)
 
 		left_margin = 20
 		top_margin = 20
 
-		max_per_column = 5
+		max_per_column = 6
 		row = 0
 
+		print(self.sortby)
+
 		for i in range(len(self.members)):
+			#if self.members[i].branch == self.sortby:
+				
 			if row > max_per_column:
 				row = 0
 				left_margin = left_margin + 200
@@ -181,10 +204,25 @@ class HoloStream(QMainWindow):
 			top_margin = top_margin  + 80
 			
 			row = row + 1
+				
+			#else:
+				#pass
 		
 
 		self.show()
 		
+	def setSortToMain(self):
+		
+		print("Sorting to main branch")
+		self.sortby = "main"
+		
+	def setSortToID(self):
+		
+		print("Sorting to ID branch") # Risu is かわいい
+		self.sortby = "ID"
+		
+		self.refresh()
+	
 	def updateLiveStatus(self):
 		for i in range(len(self.members)):
 			
@@ -195,25 +233,22 @@ class HoloStream(QMainWindow):
 
 		config = open(self.memberpath,"r")
 
-		#print(data)
-
 		configjson = json.load(config)
 
 		config.close()
 
 		for i in range(len(configjson)):
-			self.members.append(HoloLiveMember(configjson[i]['name'],configjson[i]['id'],"main",False,"images/" + configjson[i]['name'] + ".jpg"))
-			print(self.members[i].photoPath)
-			
+			self.members.append(HoloLiveMember(configjson[i]['name'],configjson[i]['id'],"main",False,self.resource_path("images/" + configjson[i]['name'] + ".jpg"),configjson[i]["branch"]))
+			print(self.members[i].branch)
 
-	def resource_path(relative):
+
+	def resource_path(self,relative_path):
 		if hasattr(sys, '_MEIPASS'):
-			return os.path.join(sys._MEIPASS, relative)
-		return os.path.join(relative)
+			return os.path.join(sys._MEIPASS, relative_path)
+		return os.path.join(os.path.abspath("."), relative_path)
 
 	def exit(self):
 		quit()
-
 
 if __name__ == '__main__':
 	
