@@ -1,98 +1,177 @@
 [
   {
     "name": "Matsuri",
-    "id": "UCQ0UDLQCjY0rmuxCDE38FGg"
+    "id": "UCQ0UDLQCjY0rmuxCDE38FGg",
+    "branch":"main"
   },
   {
     "name": "Coco",
-    "id": "UCS9uQI-jC3DE0L4IpXyvr6w"
+    "id": "UCS9uQI-jC3DE0L4IpXyvr6w",
+    "branch":"main"
   },
   {
     "name": "Fubuki",
-    "id": "UCdn5BQ06XqgXoAxIhbqw5Rg"
+    "id": "UCdn5BQ06XqgXoAxIhbqw5Rg",
+    "branch":"main"
   },
   {
     "name": "Watame",
-    "id": "UCqm3BQLlJfvkTsX_hvm0UmA"
+    "id": "UCqm3BQLlJfvkTsX_hvm0UmA",
+    "branch":"main"
   },
   {
     "name": "Kanata",
-    "id": "UCZlDXzGoo7d44bwdNObFacg"
+    "id": "UCZlDXzGoo7d44bwdNObFacg",
+    "branch":"main"
   },
   {
     "name": "Marine",
-    "id": "UCCzUftO8KOVkV4wQG1vkUvg"
+    "id": "UCCzUftO8KOVkV4wQG1vkUvg",
+    "branch":"main"
   },
   {
     "name": "Korone",
-    "id": "UChAnqc_AY5_I3Px5dig3X1Q"
+    "id": "UChAnqc_AY5_I3Px5dig3X1Q",
+    "branch":"main"
   },
   {
     "name": "Okayu",
-    "id": "UChAnqc_AY5_I3Px5dig3X1Q"
+    "id": "UChAnqc_AY5_I3Px5dig3X1Q",
+    "branch":"main"
   },
   {
     "name": "Aki",
-    "id": "UCFTLzh12_nrtzqBPsTCqenA"
+    "id": "UCFTLzh12_nrtzqBPsTCqenA",
+    "branch":"main"
   },
   {
     "name": "Miko",
-    "id": "UC-hM6YJuNYVAmUWxeIr9FeA"
+    "id": "UC-hM6YJuNYVAmUWxeIr9FeA",
+    "branch":"main"
   },
   {
     "name": "Roboco",
-    "id": "UCDqI2jOz0weumE8s7paEk6g"
+    "id": "UCDqI2jOz0weumE8s7paEk6g",
+    "branch":"main"
   },
   {
     "name": "Choco",
-    "id": "UC1suqwovbL1kzsoaZgFZLKg"
+    "id": "UC1suqwovbL1kzsoaZgFZLKg",
+    "branch":"main"
   },
   {
     "name": "Haato",
-    "id": "UC1CfXB_kRs3C-zaeTG3oGyg"
+    "id": "UC1CfXB_kRs3C-zaeTG3oGyg",
+    "branch":"main"
   },
   {
     "name": "Noal",
-    "id": "UCdyqAaZDKHXg4Ahi7VENThQ"
+    "id": "UCdyqAaZDKHXg4Ahi7VENThQ",
+    "branch":"main"
   },
   {
     "name": "Subaru",
-    "id": "UCvzGlP9oQwU--Y0r9id_jnA"
+    "id": "UCvzGlP9oQwU--Y0r9id_jnA",
+    "branch":"main"
   },
   {
     "name": "Shion",
-    "id": "UCXTpFs_3PqI41qX2d9tL2Rw"
+    "id": "UCXTpFs_3PqI41qX2d9tL2Rw",
+    "branch":"main"
   },
   {
     "name": "Ayame",
-    "id": "UC7fk0CB07ly8oSl0aqKkqFg"
+    "id": "UC7fk0CB07ly8oSl0aqKkqFg",
+    "branch":"main"
   },
   {
     "name": "Shion",
-    "id": "UCXTpFs_3PqI41qX2d9tL2Rw"
+    "id": "UCXTpFs_3PqI41qX2d9tL2Rw",
+    "branch":"main"
   },
   {
     "name": "Aqua",
-    "id": "UC1opHUrw8rvnsadT-iGp7Cg"
+    "id": "UC1opHUrw8rvnsadT-iGp7Cg",
+    "branch":"main"
   },
   {
     "name": "Pekora",
-    "id": "UC1DCedRgGHBdm81E1llLhOQ"
+    "id": "UC1DCedRgGHBdm81E1llLhOQ",
+    "branch":"main"
   },
   {
     "name": "Rushia",
-    "id": "UCl_gCybOJRIgOXw6Qb4qJzQ"
+    "id": "UCl_gCybOJRIgOXw6Qb4qJzQ",
+    "branch":"main"
   },
   {
     "name": "Flare",
-    "id": "UCvInZx9h3jC2JzsIzoOebWg"
+    "id": "UCvInZx9h3jC2JzsIzoOebWg",
+    "branch":"main"
   },
   {
     "name": "Towa",
-    "id": "UC1uv2Oq6kNxgATlCiez59hw"
+    "id": "UC1uv2Oq6kNxgATlCiez59hw",
+    "branch":"main"
   },
   {
     "name": "Luna",
-    "id": "UCa9Y57gfeY0Zro_noHRVrnw"
+    "id": "UCa9Y57gfeY0Zro_noHRVrnw",
+    "branch":"main"
+  },
+  {
+    "name": "Risu",
+    "id": "UCOyYb1c43VlX9rc_lT6NKQw",
+    "branch":"ID"
+  },
+  {
+    "name": "Hoshinova",
+    "id": "UCP0BspO_AMEe3aQqqpo89Dg",
+    "branch":"ID"
+  },
+  {
+    "name": "Lofifteen",
+    "id": "UCAoy6rzhSf4ydcYjJw3WoVg",
+    "branch":"ID"
+  },
+  {
+    "name": "Miyabi",
+    "id": "UC6t3-_N8A6ME1JShZHHqOMw",
+    "branch":"Stars"
+  },
+  {
+    "name": "Kira",
+    "id": "UCEzsociuFqVwgZuMaZqaCsg",
+    "branch":"Stars"
+  },
+  {
+    "name": "Izuru",
+    "id": "UCZgOv3YDEs-ZnZWDYVwJdmA",
+    "branch":"Stars"
+  },
+  {
+    "name": "Aruran",
+    "id": "UCKeAhJvy8zgXWbh9duVjIaQ",
+    "branch":"Stars"
+  },
+  {
+    "name": "Rikka",
+    "id": "UC9mf_ZVpouoILRY9NUIaK-w",
+    "branch":"Stars"
+  },
+  {
+    "name": "Astel",
+    "id": "UCNVEsYbiZjH5QLmGeSgTSzg",
+    "branch":"Stars"
+  },
+  {
+    "name": "Temma",
+    "id": "UCGNI4MENvnsymYjKiZwv9eg",
+    "branch":"Stars"
+  },
+  {
+    "name": "Roberu",
+    "id": "UCANDOlYTJT7N5jlRC3zfzVA",
+    "branch":"Stars"
   }
 ]

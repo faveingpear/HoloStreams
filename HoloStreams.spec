@@ -7,8 +7,9 @@ a = Analysis(['HoloStreams.py'],
              pathex=['/home/faveing/Documents/Projects/HoloStreams/HoloStreams'],
              binaries=[],
              datas=[
-				('images/*','DATA'),
-				('members.json', 'DATA')
+				('images/*','images'),
+				('members.json', '.'),
+				('config.json','.')
              ],
              hiddenimports=[],
              hookspath=[],
@@ -29,7 +30,7 @@ exe = EXE(pyz,
           bootloader_ignore_signals=False,
           strip=False,
           upx=True,
-          console=True )
+          console=False )
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,

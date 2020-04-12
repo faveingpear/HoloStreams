@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 import os 
 import sys
@@ -12,8 +13,8 @@ import requests
 import threading
 from bs4 import BeautifulSoup
 
-from PyQt5.QtWidgets import QMainWindow,QAction,QLabel, QWidget, QLineEdit, QComboBox, QPushButton, QCheckBox, QApplication
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtWidgets import QMainWindow, QAction, QLabel, QWidget, QLineEdit, QComboBox, QPushButton, QCheckBox, QApplication, QMessageBox
+from PyQt5.QtCore import Qt, QTimer, QProcess
 from PyQt5.QtGui import QIcon, QPixmap
 
 class HoloLiveMember():
@@ -64,27 +65,34 @@ class HoloLiveMember():
 		else:
 			self.livebutton.setText("Offline")
 
+# --- 	
+# Thank you so much for this amazing code pusaitou https://github.com/pusaitou/mikochiku_alarm 
+# I only slighty changed it to support the class model
 
-	def check_live(self):
-		buff_video_id_set = self.get_live_video_id(self.channel_id)
-		#print("buff_video_id_set", buff_video_id_set)
-		#print("self.old_video_id_list", self.old_video_id_list)
-		if buff_video_id_set:
-			for getting_video_id in buff_video_id_set:
-				if not getting_video_id == "" and not getting_video_id is None:
-					if not getting_video_id in self.old_video_id_list:
-						self.old_video_id_list.append(getting_video_id)
-						if len(self.old_video_id_list) > 30:
-							self.old_video_id_list = self.old_video_id_list[1:]
+	def check_live(self,sort):
+		if sort == self.branch:
+			buff_video_id_set = self.get_live_video_id(self.channel_id)
+			#print("buff_video_id_set", buff_video_id_set)
+			#print("self.old_video_id_list", self.old_video_id_list)
+			if buff_video_id_set:
+				for getting_video_id in buff_video_id_set:
+					if not getting_video_id == "" and not getting_video_id is None:
+						if not getting_video_id in self.old_video_id_list:
+							self.old_video_id_list.append(getting_video_id)
+							if len(self.old_video_id_list) > 30:
+								self.old_video_id_list = self.old_video_id_list[1:]
 
-						self.isLive = True
-						self.updateLiveStatus()
-						print(self.name + " is online: " + str(self.isLive))
-						return
+							self.isLive = True
+							self.updateLiveStatus()
+							print(self.name + " is online: " + str(self.isLive))
+							return
+				
+			#self.isLive = False
+			self.updateLiveStatus()
+			print(self.name + " is online: " + str(self.isLive))
+		else:
+			pass
 			
-		#self.isLive = False
-		self.updateLiveStatus()
-		print(self.name + " is online: " + str(self.isLive))
 	def get_live_video_id(self, search_ch_id):
 		dict_str = ""
 		video_id_set = set()
@@ -128,6 +136,7 @@ class HoloLiveMember():
 		self.videoid = video_id_set
 		return video_id_set
 
+# ---
 class HoloStream(QMainWindow):
 
 	members = []
@@ -136,10 +145,11 @@ class HoloStream(QMainWindow):
 		super().__init__()
 
 		self.memberpath = self.resource_path("members.json")
+		self.configpath = self.resource_path("config.json")
+		
+		self.initConfig()
 
 		self.loadMembers()
-
-		self.sortby = "main"
 
 		self.initUI()
 
@@ -147,7 +157,7 @@ class HoloStream(QMainWindow):
 		
 		self.timer = QTimer(self)
 		self.timer.timeout.connect(self.updateLiveStatus)
-		self.timer.setInterval(40000)
+		self.timer.setInterval(200000)
 		self.timer.start()
 
 		quitAction = QAction('Quit', self)      
@@ -160,12 +170,16 @@ class HoloStream(QMainWindow):
 		filemenu.addAction(quitAction)
 		
 		mainbranchAction = QAction("Main",self)
-		mainbranchAction.setShortcut("Ctrl-m")
+		mainbranchAction.setShortcut("Ctrl+m")
 		mainbranchAction.triggered.connect(self.setSortToMain)
 		
 		IDbranchAction = QAction("ID",self)
-		IDbranchAction.setShortcut("Ctrl-i")
+		IDbranchAction.setShortcut("Ctrl+i")
 		IDbranchAction.triggered.connect(self.setSortToID)
+		
+		holoStarsbranchAction = QAction("Stars",self)
+		holoStarsbranchAction.setShortcut("Ctrl+s")
+		holoStarsbranchAction.triggered.connect(self.setSortToStars)
 		
 		# Will turn into china but I have no way of chekcing the live status yet
 		#mainbranchAction = QAction("Main",self) 
@@ -175,58 +189,89 @@ class HoloStream(QMainWindow):
 		holomenu = menubar.addMenu("HoloLive")
 		holomenu.addAction(mainbranchAction)
 		holomenu.addAction(IDbranchAction)
+		holomenu.addAction(holoStarsbranchAction)
 		
 		self.setGeometry(640, 640, 820, 560)
 		self.setWindowTitle('HoloStreams')    
 
-
 		# Why did this take take so long to make?
 		# But for the waifus at homolive it's worth it... (21:43)
+		# Risu's stream was so cute and the korone callab was amazing too. Also I missed Artia's Streams Im so sorry -_- 5am was to early for me :( (23:18)
 
+		self.displayMembers()
+		
+		self.show()
+		
+		self.updateLiveStatus()
+		
+	def displayMembers(self):
 		left_margin = 20
 		top_margin = 20
 
 		max_per_column = 6
 		row = 0
 
-		print(self.sortby)
+		print("Sorting by:" + self.sortBy)
 
 		for i in range(len(self.members)):
-			#if self.members[i].branch == self.sortby:
+			if self.members[i].branch == self.sortBy:
 				
-			if row > max_per_column:
-				row = 0
-				left_margin = left_margin + 200
-				top_margin  = 20
+				if row > max_per_column:
+					row = 0
+					left_margin = left_margin + 200
+					top_margin  = 20
+					
+				self.members[i].addElements(self,left_margin,top_margin)
 				
-			self.members[i].addElements(self,left_margin,top_margin)
-			
-			top_margin = top_margin  + 80
-			
-			row = row + 1
+				top_margin = top_margin  + 80
 				
-			#else:
-				#pass
-		
-
-		self.show()
-		
+				row = row + 1
+					
+			else:
+				pass	
+	
 	def setSortToMain(self):
 		
-		print("Sorting to main branch")
+		self.config['sort'] = "main"
 		self.sortby = "main"
+		
+		self.saveConfig()
+		
+		self.displayMessage(QMessageBox.Warning,"Please restart for this setting to apply","","Info","")
 		
 	def setSortToID(self):
 		
-		print("Sorting to ID branch") # Risu is かわいい
+		self.config['sort'] = "ID"
 		self.sortby = "ID"
 		
-		self.refresh()
-	
+		self.saveConfig()
+		
+		self.displayMessage(QMessageBox.Warning,"Please restart for this setting to apply","","Info","")
+		
+	def setSortToStars(self):
+		
+		self.config['sort'] = "Stars"
+		self.sortby = "Stars"
+		
+		self.saveConfig()
+		
+		self.displayMessage(QMessageBox.Warning,"Please restart for this setting to apply","","Info","")
+		
+	def displayMessage(self,icon,text,informative_text,title,detailed_text):
+		
+		msg = QMessageBox()
+		msg.setIcon(icon)
+		msg.setText(text)
+		msg.setInformativeText(informative_text)
+		msg.setWindowTitle(title)
+		msg.setDetailedText(detailed_text)
+		
+		retval = msg.exec_()
+
 	def updateLiveStatus(self):
 		for i in range(len(self.members)):
 			
-			t = threading.Thread(target=self.members[i].check_live)
+			t = threading.Thread(target=self.members[i].check_live, args=(self.sortBy,))
 			t.start()
 
 	def loadMembers(self):
@@ -239,8 +284,27 @@ class HoloStream(QMainWindow):
 
 		for i in range(len(configjson)):
 			self.members.append(HoloLiveMember(configjson[i]['name'],configjson[i]['id'],"main",False,self.resource_path("images/" + configjson[i]['name'] + ".jpg"),configjson[i]["branch"]))
-			print(self.members[i].branch)
+			#print(self.members[i].branch)
 
+	def initConfig(self):
+		
+		file = open(self.configpath,"r")
+		
+		self.config = json.load(file)
+		
+		file.close()
+		
+		self.sortBy = self.config['sort']
+
+	def saveConfig(self):
+		
+		file = open(self.configpath,"w")
+		
+		json.dump(self.config,file,ensure_ascii = False, indent=4)
+		
+		file.close()
+		
+		print("Saved Config")
 
 	def resource_path(self,relative_path):
 		if hasattr(sys, '_MEIPASS'):
