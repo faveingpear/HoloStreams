@@ -1,0 +1,14 @@
+{
+	"title":"HoloStreams",
+	"menuOption1":"File",
+	"menuOption1Selector1":"quit",
+	"menuOption2":"Hololive",
+	"menuOption2Selector1":"Hololive",
+	"menuOption2Selector2":"HololiveID",
+	"menuOption2Selector3":"HoloStars",
+	"menuOption3":"Language",
+	"buttonOfflineMessage":"offline",
+	"buttonliveMessage":"Live!",
+	"ErrorMessageTitle":"Error",
+	"RestartMessage":"Please restart for this setting to apply"
+}

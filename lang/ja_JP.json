@@ -1,0 +1,14 @@
+{
+	"title":"ホロライブ",
+	"menuOption1":"ファイル",
+	"menuOption1Selector1":"止める",
+	"menuOption2":"ホロライブ",
+	"menuOption2Selector1":"ホロライブ",
+	"menuOption2Selector2":"ホロライブID",
+	"menuOption2Selector3":"ホロスターズ",
+	"menuOption3":"言語",
+	"buttonOfflineMessage":"非直結",
+	"buttonliveMessage":"ライブ!", 
+	"ErrorMessageTitle":"エラー",
+	"RestartMessage":"プログラムを止めてください"
+}

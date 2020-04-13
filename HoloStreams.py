@@ -28,8 +28,6 @@ class HoloLiveMember():
 
 	videoid = set()
 
-	old_video_id_list = []
-
 	def __init__(self, name, channel_id, devision, isLive,photopath,branch):
 		self.devision = devision
 		self.channel_id = channel_id
@@ -37,8 +35,9 @@ class HoloLiveMember():
 		self.isLive = isLive
 		self.photoPath = photopath
 		self.branch = branch
-		
-	def addElements(self, container,x,y):
+		self.old_video_id_list = []
+
+	def addElements(self, container,x,y, buttontext):
 		self.pfplabel = QLabel(container)
 		Pixmap = QPixmap(self.photoPath)
 		newPixmap = Pixmap.scaled(64, 64, Qt.KeepAspectRatio)
@@ -48,7 +47,7 @@ class HoloLiveMember():
 		
 		self.livebutton = QPushButton(container)
 		self.livebutton.clicked.connect(self.openLiveStream)
-		self.livebutton.setText("Offline")
+		self.livebutton.setText(buttontext)
 		self.livebutton.move(x+84, y+12)
 	
 	def openLiveStream(self):
@@ -58,18 +57,18 @@ class HoloLiveMember():
 		else:
 			print("Not live")
 	
-	def updateLiveStatus(self):
+	def updateLiveStatus(self, offline, live):
 		
 		if self.isLive:
-			self.livebutton.setText("Live!")
+			self.livebutton.setText(live)
 		else:
-			self.livebutton.setText("Offline")
+			self.livebutton.setText(offline)
 
 # --- 	
 # Thank you so much for this amazing code pusaitou https://github.com/pusaitou/mikochiku_alarm 
 # I only slighty changed it to support the class model
 
-	def check_live(self,sort):
+	def check_live(self,sort, offline, live):
 		if sort == self.branch:
 			buff_video_id_set = self.get_live_video_id(self.channel_id)
 			#print("buff_video_id_set", buff_video_id_set)
@@ -83,12 +82,12 @@ class HoloLiveMember():
 								self.old_video_id_list = self.old_video_id_list[1:]
 
 							self.isLive = True
-							self.updateLiveStatus()
+							self.updateLiveStatus(offline, live)
 							print(self.name + " is online: " + str(self.isLive))
 							return
 				
 			#self.isLive = False
-			self.updateLiveStatus()
+			self.updateLiveStatus(offline, live)
 			print(self.name + " is online: " + str(self.isLive))
 		else:
 			pass
@@ -137,6 +136,55 @@ class HoloLiveMember():
 		return video_id_set
 
 # ---
+
+# Config class the can be used in any future projects
+class Config:
+
+	def __init__(self, path, listOfOptions, name):
+
+		self.name = name
+
+		self.configData = ""
+
+		file = open(path,"r")
+
+		self.configData = json.load(file)
+
+		file.close()
+
+		print("Inputed path" + str(path))
+		print("Inputed options" + str(listOfOptions))
+		print("Retrevied Data" + str(self.configData))
+
+		# for option in listOfOptions:
+
+		# 	self.configs[option].append(self.configData[option])
+
+		# 	print("Added option " + str(option) + " with value " + str(self.configs[option]) + " to " + self.name)
+
+		# print("New Data: " + str(self.configs))
+
+	def getOption(self, option):
+
+		return self.configData[option]
+
+
+	def setOption(self, option, value):
+
+		#print("Setting option " + self.configData[option] + " to value " + value)
+		self.configData[option] = value
+		#print("New Data: " + self.configData)
+
+	def saveConfig(self,path):
+
+		file = open(path,"w")
+
+		#print("Saving Data: " + str(self.configData))
+
+		json.dump(self.configData,file,ensure_ascii = False, indent=4)
+
+		file.close()
+
 class HoloStream(QMainWindow):
 
 	members = []
@@ -146,8 +194,35 @@ class HoloStream(QMainWindow):
 
 		self.memberpath = self.resource_path("members.json")
 		self.configpath = self.resource_path("config.json")
+		self.languagepath = self.resource_path("lang/")
+
+		self.mainConfigOptions = [
+			'sort',
+			'updates',
+			'language'
+		]
+
+		self.textLanguageOptions = [
+			'title',
+			'menuOption1',
+			'menuOption1Selector1',
+			'menuOption2',
+			'menuOption2Selector1',
+			'menuOption2Selector2',
+			'menuOption2Selector3',
+			'menuOption3',
+			'buttonOfflineMessage',
+			'buttonliveMessage',
+			'ErrorMessageTitle',
+			'RestartMessage'
+		]
 		
 		self.initConfig()
+
+		self.initLocalization()
+
+		print("Mainconfig: " + str(self.Mainconfig.configData))
+		print("LanguageConfig: " + str(self.languageData.configData))
 
 		self.loadMembers()
 
@@ -157,27 +232,27 @@ class HoloStream(QMainWindow):
 		
 		self.timer = QTimer(self)
 		self.timer.timeout.connect(self.updateLiveStatus)
-		self.timer.setInterval(200000)
+		self.timer.setInterval(self.Mainconfig.getOption('updates'))
 		self.timer.start()
 
-		quitAction = QAction('Quit', self)      
+		quitAction = QAction(self.languageData.getOption(self.textLanguageOptions[2]), self)   
 		quitAction.setShortcut("Ctrl+q")  
 		quitAction.setStatusTip("Quit Application")
 		quitAction.triggered.connect(self.exit)
 
 		menubar = self.menuBar()
-		filemenu = menubar.addMenu("File")
+		filemenu = menubar.addMenu(self.languageData.getOption(self.textLanguageOptions[1]))
 		filemenu.addAction(quitAction)
 		
-		mainbranchAction = QAction("Main",self)
+		mainbranchAction = QAction(self.languageData.getOption(self.textLanguageOptions[4]),self)
 		mainbranchAction.setShortcut("Ctrl+m")
 		mainbranchAction.triggered.connect(self.setSortToMain)
 		
-		IDbranchAction = QAction("ID",self)
+		IDbranchAction = QAction(self.languageData.getOption(self.textLanguageOptions[5]),self)
 		IDbranchAction.setShortcut("Ctrl+i")
 		IDbranchAction.triggered.connect(self.setSortToID)
 		
-		holoStarsbranchAction = QAction("Stars",self)
+		holoStarsbranchAction = QAction(self.languageData.getOption(self.textLanguageOptions[6]),self)
 		holoStarsbranchAction.setShortcut("Ctrl+s")
 		holoStarsbranchAction.triggered.connect(self.setSortToStars)
 		
@@ -186,13 +261,25 @@ class HoloStream(QMainWindow):
 		#mainbranchAction.setShortcut("Ctrl-m")
 		#mainbranchAction.triggered.connect(self.setSortToMain)
 		
-		holomenu = menubar.addMenu("HoloLive")
+		holomenu = menubar.addMenu(self.languageData.getOption(self.textLanguageOptions[0]))
 		holomenu.addAction(mainbranchAction)
 		holomenu.addAction(IDbranchAction)
 		holomenu.addAction(holoStarsbranchAction)
+
+		englishAction = QAction("English",self)
+		englishAction.setShortcut("Ctrl-e")
+		englishAction.triggered.connect(self.setLanguageToEnglish)
 		
+		japaneseAction = QAction("日本語",self)
+		japaneseAction.setShortcut("Ctrl-e")
+		japaneseAction.triggered.connect(self.setLanguageToJapanese)
+
+		languageMenu = menubar.addMenu(self.languageData.getOption(self.textLanguageOptions[7]))
+		languageMenu.addAction(englishAction)
+		languageMenu.addAction(japaneseAction)
+
 		self.setGeometry(640, 640, 820, 560)
-		self.setWindowTitle('HoloStreams')    
+		self.setWindowTitle(self.languageData.getOption(self.textLanguageOptions[0]))    
 
 		# Why did this take take so long to make?
 		# But for the waifus at homolive it's worth it... (21:43)
@@ -203,7 +290,21 @@ class HoloStream(QMainWindow):
 		self.show()
 		
 		self.updateLiveStatus()
+
+	def setLanguageToJapanese(self):
+
+		self.Mainconfig.setOption('language','ja_JP')
+		self.Mainconfig.saveConfig(self.configpath)
+
+		self.displayMessage(QMessageBox.Warning,self.languageData.getOption(self.textLanguageOptions[11]),"","Info","")
+
+	def setLanguageToEnglish(self):
+
+		self.Mainconfig.setOption('language','en_US')
+		self.Mainconfig.saveConfig(self.configpath)
 		
+		self.displayMessage(QMessageBox.Warning,self.languageData.getOption(self.textLanguageOptions[11]),"","Info","")
+
 	def displayMembers(self):
 		left_margin = 20
 		top_margin = 20
@@ -211,17 +312,17 @@ class HoloStream(QMainWindow):
 		max_per_column = 6
 		row = 0
 
-		print("Sorting by:" + self.sortBy)
+		print("Sorting by:" + self.Mainconfig.getOption('sort'))
 
 		for i in range(len(self.members)):
-			if self.members[i].branch == self.sortBy:
+			if self.members[i].branch == self.Mainconfig.getOption('sort'):
 				
 				if row > max_per_column:
 					row = 0
 					left_margin = left_margin + 200
 					top_margin  = 20
 					
-				self.members[i].addElements(self,left_margin,top_margin)
+				self.members[i].addElements(self,left_margin,top_margin,self.languageData.getOption(self.textLanguageOptions[8]))
 				
 				top_margin = top_margin  + 80
 				
@@ -232,30 +333,29 @@ class HoloStream(QMainWindow):
 	
 	def setSortToMain(self):
 		
-		self.config['sort'] = "main"
-		self.sortby = "main"
+		#self.config['sort'] = "main"
+
+		self.Mainconfig.setOption('sort','main')
 		
 		self.saveConfig()
 		
-		self.displayMessage(QMessageBox.Warning,"Please restart for this setting to apply","","Info","")
+		self.displayMessage(QMessageBox.Warning,self.languageData.getOption(self.textLanguageOptions[11]),"","Info","")
 		
 	def setSortToID(self):
 		
-		self.config['sort'] = "ID"
-		self.sortby = "ID"
+		self.Mainconfig.setOption('sort','ID')
 		
 		self.saveConfig()
 		
-		self.displayMessage(QMessageBox.Warning,"Please restart for this setting to apply","","Info","")
+		self.displayMessage(QMessageBox.Warning,self.languageData.getOption(self.textLanguageOptions[11]),"","Info","")
 		
 	def setSortToStars(self):
 		
-		self.config['sort'] = "Stars"
-		self.sortby = "Stars"
+		self.Mainconfig.setOption('sort','Stars')
 		
 		self.saveConfig()
 		
-		self.displayMessage(QMessageBox.Warning,"Please restart for this setting to apply","","Info","")
+		self.displayMessage(QMessageBox.Warning,self.languageData.getOption(self.textLanguageOptions[11]),"","Info","")
 		
 	def displayMessage(self,icon,text,informative_text,title,detailed_text):
 		
@@ -271,38 +371,36 @@ class HoloStream(QMainWindow):
 	def updateLiveStatus(self):
 		for i in range(len(self.members)):
 			
-			t = threading.Thread(target=self.members[i].check_live, args=(self.sortBy,))
+			t = threading.Thread(target=self.members[i].check_live, args=(self.Mainconfig.getOption('sort'),self.languageData.getOption(self.textLanguageOptions[8]),self.languageData.getOption(self.textLanguageOptions[9])))
 			t.start()
 
 	def loadMembers(self):
 
-		config = open(self.memberpath,"r")
+		membersfile = open(self.memberpath,"r")
 
-		configjson = json.load(config)
+		members = json.load(membersfile)
 
-		config.close()
+		membersfile.close()
 
-		for i in range(len(configjson)):
-			self.members.append(HoloLiveMember(configjson[i]['name'],configjson[i]['id'],"main",False,self.resource_path("images/" + configjson[i]['name'] + ".jpg"),configjson[i]["branch"]))
-			#print(self.members[i].branch)
+		for i in range(len(members)):
+			self.members.append(HoloLiveMember(members[i]['name'],members[i]['id'],"main",False,self.resource_path("images/" + members[i]['name'] + ".jpg"),members[i]["branch"]))
 
 	def initConfig(self):
 		
-		file = open(self.configpath,"r")
-		
-		self.config = json.load(file)
-		
-		file.close()
-		
-		self.sortBy = self.config['sort']
+		self.Mainconfig = Config(self.configpath,self.mainConfigOptions,"Mainconfig")
+
+		print("Loaded Config")
+
+
+	def initLocalization(self):
+
+		self.languageData = Config(self.languagepath + str(self.Mainconfig.getOption('language')) + ".json", self.textLanguageOptions, "LanguageConfig")
+
+		#self.languageData.getOption('title')
 
 	def saveConfig(self):
-		
-		file = open(self.configpath,"w")
-		
-		json.dump(self.config,file,ensure_ascii = False, indent=4)
-		
-		file.close()
+
+		self.Mainconfig.saveConfig(self.resource_path("config.json"))
 		
 		print("Saved Config")
 

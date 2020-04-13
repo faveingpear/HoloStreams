@@ -4,6 +4,9 @@ pyinstaller HoloStreams.spec
 
 mkdir dist/HoloStreams/images/
 mkdir dist/HoloStreams/DATA/
+mkdir dist/HoloStreams/lang/
 
 cp images/* dist/HoloStreams/images
-cp members.json dist/HoloStreams/DATA
+cp members.json dist/HoloStreams/
+cp config.json dist/HoloStreams/
+cp lang/* dist/HoloStreams/lang/

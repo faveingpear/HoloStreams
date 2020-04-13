@@ -9,7 +9,8 @@ a = Analysis(['HoloStreams.py'],
              datas=[
 				('images/*','images'),
 				('members.json', '.'),
-				('config.json','.')
+				('config.json','.'),
+        ('lang/*','lang')
              ],
              hiddenimports=[],
              hookspath=[],
