@@ -13,20 +13,11 @@ import requests
 import threading
 from bs4 import BeautifulSoup
 
-from PyQt5.QtWidgets import QMainWindow, QAction, QLabel, QWidget, QLineEdit, QComboBox, QPushButton, QCheckBox, QApplication, QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QScrollArea, QVBoxLayout, QGroupBox, QGridLayout, QAction, QLabel, QWidget, QLineEdit, QComboBox, QPushButton, QCheckBox, QApplication, QMessageBox
 from PyQt5.QtCore import Qt, QTimer, QProcess
 from PyQt5.QtGui import QIcon, QPixmap
 
 class HoloLiveMember():
-
-	branch = "" # main/ID/Stars/CN
-
-	name = ""
-	channel_id = ""
-	photoPath = ""
-	isLive = False
-
-	videoid = set()
 
 	def __init__(self, name, channel_id, devision, isLive,photopath,branch):
 		self.devision = devision
@@ -36,19 +27,30 @@ class HoloLiveMember():
 		self.photoPath = photopath
 		self.branch = branch
 		self.old_video_id_list = []
+		self.videoid = set()
 
 	def addElements(self, container,x,y, buttontext):
-		self.pfplabel = QLabel(container)
+
+		self.containerWidget = QWidget() #Widget to containe the Hboxlayout
+
+		self.containerBox = QHBoxLayout() #layout so that the pfp a button are right next to eachother
+
+		self.pfplabel = QLabel()
 		Pixmap = QPixmap(self.photoPath)
 		newPixmap = Pixmap.scaled(64, 64, Qt.KeepAspectRatio)
 		self.pfplabel.setPixmap(newPixmap)
 		self.pfplabel.resize(64,64)
-		self.pfplabel.move(x,y)
+		self.containerBox.addWidget(self.pfplabel)
 		
-		self.livebutton = QPushButton(container)
+		self.containerBox.addStretch()
+
+		self.livebutton = QPushButton()
 		self.livebutton.clicked.connect(self.openLiveStream)
 		self.livebutton.setText(buttontext)
-		self.livebutton.move(x+84, y+12)
+		self.containerBox.addWidget(self.livebutton)
+
+		self.containerWidget.setLayout(self.containerBox)
+		container.addWidget(self.containerWidget,x,y)
 	
 	def openLiveStream(self):
 		if self.isLive:
@@ -179,7 +181,7 @@ class Config:
 
 		file = open(path,"w")
 
-		#print("Saving Data: " + str(self.configData))
+		print("Saving Data: " + str(self.configData) + " to " + path)
 
 		json.dump(self.configData,file,ensure_ascii = False, indent=4)
 
@@ -187,14 +189,14 @@ class Config:
 
 class HoloStream(QMainWindow):
 
-	members = []
-
 	def __init__(self):
 		super().__init__()
 
 		self.memberpath = self.resource_path("members.json")
 		self.configpath = self.resource_path("config.json")
 		self.languagepath = self.resource_path("lang/")
+
+		self.members = []
 
 		self.mainConfigOptions = [
 			'sort',
@@ -278,14 +280,31 @@ class HoloStream(QMainWindow):
 		languageMenu.addAction(englishAction)
 		languageMenu.addAction(japaneseAction)
 
-		self.setGeometry(640, 640, 820, 560)
+		self.scroll = QScrollArea(self)             # Scroll Area which contains the widgets, set as the centralWidget
+		self.widget = QWidget()                 # Widget that contains the collection of Vertical Box
+		self.grid = QGridLayout()               # The Vertical Box that contains the Horizontal Boxes of  labels and buttons
+
+		# Add widgets here
+		self.displayMembers(self.grid)
+	
+		self.widget.setLayout(self.grid)
+
+		#Scroll Area Properties
+		self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+		self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+		self.scroll.setWidgetResizable(True)
+		self.scroll.setWidget(self.widget)
+
+		self.setCentralWidget(self.scroll)
+
+		self.setGeometry(640, 640, 880, 560)
 		self.setWindowTitle(self.languageData.getOption(self.textLanguageOptions[0]))    
 
 		# Why did this take take so long to make?
 		# But for the waifus at homolive it's worth it... (21:43)
 		# Risu's stream was so cute and the korone callab was amazing too. Also I missed Artia's Streams Im so sorry -_- 5am was to early for me :( (23:18)
 
-		self.displayMembers()
+		#self.displayMembers()
 		
 		self.show()
 		
@@ -294,50 +313,73 @@ class HoloStream(QMainWindow):
 	def setLanguageToJapanese(self):
 
 		self.Mainconfig.setOption('language','ja_JP')
-		self.Mainconfig.saveConfig(self.configpath)
+		self.languageData.saveConfig(self.resource_path(self.languagepath))
 
 		self.displayMessage(QMessageBox.Warning,self.languageData.getOption(self.textLanguageOptions[11]),"","Info","")
 
 	def setLanguageToEnglish(self):
 
 		self.Mainconfig.setOption('language','en_US')
-		self.Mainconfig.saveConfig(self.configpath)
+		self.languageData.saveConfig(self.resource_path(self.languagepath))
 		
 		self.displayMessage(QMessageBox.Warning,self.languageData.getOption(self.textLanguageOptions[11]),"","Info","")
 
-	def displayMembers(self):
-		left_margin = 20
-		top_margin = 20
+	def displayMembers(self,grid):
 
-		max_per_column = 6
-		row = 0
+		# for i in range(len(self.members)):
+		# 	if self.members[i].branch == self.Mainconfig.getOption('sort'):
+				
+		# 		if row > max_per_column:
+		# 			row = 0
+		# 			left_margin = left_margin + 200
+		# 			top_margin  = 20
+					
+		# 		self.members[i].addElements(grid,left_margin,top_margin,self.languageData.getOption(self.textLanguageOptions[8]))
+				
+		# 		top_margin = top_margin  + 80
+				
+		# 		row = row + 1
+				
+		# 	else:
+		# 		pass	
+		
+		# i = 0
+		# for x in range(rows):
+		# 	for y in range(columns):
+		# 		print(self.members[i].name)
+		# 		if self.members[i].branch == self.Mainconfig.getOption('sort'):
+		# 			self.members[i].addElements(grid,x,y,self.languageData.getOption(self.textLanguageOptions[8]))
+		# 			i = i + 1
+		# 		else:
+		# 			x = x - 1
+		# 			y = y - 1
+		# 			i = i + 1
 
-		print("Sorting by:" + self.Mainconfig.getOption('sort'))
-
-		for i in range(len(self.members)):
+		column = 1
+		row = 1
+		max_row = 5
+		i = 0
+		for member in self.members:
 			if self.members[i].branch == self.Mainconfig.getOption('sort'):
-				
-				if row > max_per_column:
+				print("Adding " + self.members[i].name + " to " + str(column) + " " + str(row))
+				self.members[i].addElements(grid,column,row,self.languageData.getOption(self.textLanguageOptions[8]))
+				i = i + 1
+
+				if row == max_row:
+					column = column + 1
 					row = 0
-					left_margin = left_margin + 200
-					top_margin  = 20
-					
-				self.members[i].addElements(self,left_margin,top_margin,self.languageData.getOption(self.textLanguageOptions[8]))
-				
-				top_margin = top_margin  + 80
-				
+
 				row = row + 1
-					
 			else:
-				pass	
-	
+				i = i + 1
+
 	def setSortToMain(self):
 		
 		#self.config['sort'] = "main"
 
 		self.Mainconfig.setOption('sort','main')
 		
-		self.saveConfig()
+		self.Mainconfig.saveConfig(self.resource_path(self.configpath))
 		
 		self.displayMessage(QMessageBox.Warning,self.languageData.getOption(self.textLanguageOptions[11]),"","Info","")
 		
@@ -345,7 +387,7 @@ class HoloStream(QMainWindow):
 		
 		self.Mainconfig.setOption('sort','ID')
 		
-		self.saveConfig()
+		self.Mainconfig.saveConfig(self.resource_path(self.configpath))
 		
 		self.displayMessage(QMessageBox.Warning,self.languageData.getOption(self.textLanguageOptions[11]),"","Info","")
 		
@@ -353,7 +395,7 @@ class HoloStream(QMainWindow):
 		
 		self.Mainconfig.setOption('sort','Stars')
 		
-		self.saveConfig()
+		self.Mainconfig.saveConfig(self.resource_path(self.configpath))
 		
 		self.displayMessage(QMessageBox.Warning,self.languageData.getOption(self.textLanguageOptions[11]),"","Info","")
 		
@@ -380,9 +422,12 @@ class HoloStream(QMainWindow):
 
 		members = json.load(membersfile)
 
+		#print(members)
+
 		membersfile.close()
 
 		for i in range(len(members)):
+			print("Adding " + members[i]['name'] + " " + members[i]['id'] + " " + members[i]["branch"])
 			self.members.append(HoloLiveMember(members[i]['name'],members[i]['id'],"main",False,self.resource_path("images/" + members[i]['name'] + ".jpg"),members[i]["branch"]))
 
 	def initConfig(self):
@@ -400,7 +445,7 @@ class HoloStream(QMainWindow):
 
 	def saveConfig(self):
 
-		self.Mainconfig.saveConfig(self.resource_path("config.json"))
+		self.Mainconfig.saveConfig(self.resource_path(self.configpath))
 		
 		print("Saved Config")
 
@@ -410,7 +455,7 @@ class HoloStream(QMainWindow):
 		return os.path.join(os.path.abspath("."), relative_path)
 
 	def exit(self):
-		quit()
+		self.close()
 
 if __name__ == '__main__':
 	
