@@ -13,7 +13,7 @@ import requests
 import threading
 from bs4 import BeautifulSoup
 
-from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QScrollArea, QVBoxLayout, QGroupBox, QGridLayout, QAction, QLabel, QWidget, QLineEdit, QComboBox, QPushButton, QCheckBox, QApplication, QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QTabWidget, QHBoxLayout, QScrollArea, QVBoxLayout, QGroupBox, QGridLayout, QAction, QLabel, QWidget, QLineEdit, QComboBox, QPushButton, QCheckBox, QApplication, QMessageBox
 from PyQt5.QtCore import Qt, QTimer, QProcess
 from PyQt5.QtGui import QIcon, QPixmap
 
@@ -70,29 +70,29 @@ class HoloLiveMember():
 # Thank you so much for this amazing code pusaitou https://github.com/pusaitou/mikochiku_alarm 
 # I only slighty changed it to support the class model
 
-	def check_live(self,sort, offline, live):
-		if sort == self.branch:
-			buff_video_id_set = self.get_live_video_id(self.channel_id)
-			#print("buff_video_id_set", buff_video_id_set)
-			#print("self.old_video_id_list", self.old_video_id_list)
-			if buff_video_id_set:
-				for getting_video_id in buff_video_id_set:
-					if not getting_video_id == "" and not getting_video_id is None:
-						if not getting_video_id in self.old_video_id_list:
-							self.old_video_id_list.append(getting_video_id)
-							if len(self.old_video_id_list) > 30:
-								self.old_video_id_list = self.old_video_id_list[1:]
+	def check_live(self, offline, live):
+		#if sort == self.branch:
+		buff_video_id_set = self.get_live_video_id(self.channel_id)
+		#print("buff_video_id_set", buff_video_id_set)
+		#print("self.old_video_id_list", self.old_video_id_list)
+		if buff_video_id_set:
+			for getting_video_id in buff_video_id_set:
+				if not getting_video_id == "" and not getting_video_id is None:
+					if not getting_video_id in self.old_video_id_list:
+						self.old_video_id_list.append(getting_video_id)
+						if len(self.old_video_id_list) > 30:
+							self.old_video_id_list = self.old_video_id_list[1:]
 
-							self.isLive = True
-							self.updateLiveStatus(offline, live)
-							print(self.name + " is online: " + str(self.isLive))
-							return
-				
-			#self.isLive = False
-			self.updateLiveStatus(offline, live)
-			print(self.name + " is online: " + str(self.isLive))
-		else:
-			pass
+						self.isLive = True
+						self.updateLiveStatus(offline, live)
+						print(self.name + " is online: " + str(self.isLive))
+						return
+			
+		#self.isLive = False
+		self.updateLiveStatus(offline, live)
+		print(self.name + " is online: " + str(self.isLive))
+		#else:
+		#	pass
 			
 	def get_live_video_id(self, search_ch_id):
 		dict_str = ""
@@ -199,7 +199,6 @@ class HoloStream(QMainWindow):
 		self.members = []
 
 		self.mainConfigOptions = [
-			'sort',
 			'updates',
 			'language'
 		]
@@ -219,6 +218,8 @@ class HoloStream(QMainWindow):
 			'RestartMessage'
 		]
 		
+		#self.sort = "main"
+
 		self.initConfig()
 
 		self.initLocalization()
@@ -246,27 +247,28 @@ class HoloStream(QMainWindow):
 		filemenu = menubar.addMenu(self.languageData.getOption(self.textLanguageOptions[1]))
 		filemenu.addAction(quitAction)
 		
-		mainbranchAction = QAction(self.languageData.getOption(self.textLanguageOptions[4]),self)
-		mainbranchAction.setShortcut("Ctrl+m")
-		mainbranchAction.triggered.connect(self.setSortToMain)
+		# mainbranchAction = QAction(self.languageData.getOption(self.textLanguageOptions[4]),self)
+		# mainbranchAction.setShortcut("Ctrl+m")
+		# mainbranchAction.triggered.connect(self.setSortToMain)
 		
-		IDbranchAction = QAction(self.languageData.getOption(self.textLanguageOptions[5]),self)
-		IDbranchAction.setShortcut("Ctrl+i")
-		IDbranchAction.triggered.connect(self.setSortToID)
+		# IDbranchAction = QAction(self.languageData.getOption(self.textLanguageOptions[5]),self)
+		# IDbranchAction.setShortcut("Ctrl+i")
+		# IDbranchAction.triggered.connect(self.setSortToID)
 		
-		holoStarsbranchAction = QAction(self.languageData.getOption(self.textLanguageOptions[6]),self)
-		holoStarsbranchAction.setShortcut("Ctrl+s")
-		holoStarsbranchAction.triggered.connect(self.setSortToStars)
+		# holoStarsbranchAction = QAction(self.languageData.getOption(self.textLanguageOptions[6]),self)
+		# holoStarsbranchAction.setShortcut("Ctrl+s")
+		# holoStarsbranchAction.triggered.connect(self.setSortToStars)
 		
 		# Will turn into china but I have no way of chekcing the live status yet
 		#mainbranchAction = QAction("Main",self) 
 		#mainbranchAction.setShortcut("Ctrl-m")
 		#mainbranchAction.triggered.connect(self.setSortToMain)
 		
-		holomenu = menubar.addMenu(self.languageData.getOption(self.textLanguageOptions[0]))
-		holomenu.addAction(mainbranchAction)
-		holomenu.addAction(IDbranchAction)
-		holomenu.addAction(holoStarsbranchAction)
+		# No need since I swithed to tabed ui although If I ever add nijisanji I will add a menu like this
+		# holomenu = menubar.addMenu(self.languageData.getOption(self.textLanguageOptions[0]))
+		# holomenu.addAction(mainbranchAction)
+		# holomenu.addAction(IDbranchAction)
+		# holomenu.addAction(holoStarsbranchAction)
 
 		englishAction = QAction("English",self)
 		englishAction.setShortcut("Ctrl-e")
@@ -280,22 +282,18 @@ class HoloStream(QMainWindow):
 		languageMenu.addAction(englishAction)
 		languageMenu.addAction(japaneseAction)
 
-		self.scroll = QScrollArea(self)             # Scroll Area which contains the widgets, set as the centralWidget
-		self.widget = QWidget()                 # Widget that contains the collection of Vertical Box
-		self.grid = QGridLayout()               # The Vertical Box that contains the Horizontal Boxes of  labels and buttons
+		self.mainlayout = QTabWidget()
 
-		# Add widgets here
-		self.displayMembers(self.grid)
-	
-		self.widget.setLayout(self.grid)
+		self.tab1 = self.makeTab("main")
+		self.tab2 = self.makeTab("ID")
+		self.tab3 = self.makeTab("Stars")
+		
+		self.mainlayout.addTab(self.tab1, "Main")
+		self.mainlayout.addTab(self.tab2, "ID")
+		self.mainlayout.addTab(self.tab3, "Stars")
 
-		#Scroll Area Properties
-		self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-		self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-		self.scroll.setWidgetResizable(True)
-		self.scroll.setWidget(self.widget)
-
-		self.setCentralWidget(self.scroll)
+		#self.mainWidget.setLayout(self.mainlayout)
+		self.setCentralWidget(self.mainlayout)
 
 		self.setGeometry(640, 640, 880, 560)
 		self.setWindowTitle(self.languageData.getOption(self.textLanguageOptions[0]))    
@@ -309,6 +307,24 @@ class HoloStream(QMainWindow):
 		self.show()
 		
 		self.updateLiveStatus()
+
+	def makeTab(self,sort):
+		scroll = QScrollArea()             # Scroll Area which contains the widgets, set as the centralWidget
+		widget = QWidget()                 # Widget that contains the collection of Vertical Box
+		grid = QGridLayout()               # The Vertical Box that contains the Horizontal Boxes of  labels and buttons
+
+		# Add widgets here
+		self.displayMembers(sort,grid)
+	
+		widget.setLayout(grid)
+
+		#Scroll Area Properties
+		scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+		scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+		scroll.setWidgetResizable(True)
+		scroll.setWidget(widget)
+
+		return scroll
 
 	def setLanguageToJapanese(self):
 
@@ -324,7 +340,7 @@ class HoloStream(QMainWindow):
 		
 		self.displayMessage(QMessageBox.Warning,self.languageData.getOption(self.textLanguageOptions[11]),"","Info","")
 
-	def displayMembers(self,grid):
+	def displayMembers(self,sort,grid):
 
 		# for i in range(len(self.members)):
 		# 	if self.members[i].branch == self.Mainconfig.getOption('sort'):
@@ -360,8 +376,8 @@ class HoloStream(QMainWindow):
 		max_row = 5
 		i = 0
 		for member in self.members:
-			if self.members[i].branch == self.Mainconfig.getOption('sort'):
-				print("Adding " + self.members[i].name + " to " + str(column) + " " + str(row))
+			if self.members[i].branch == sort:
+				print("Adding " + self.members[i].name + " to " + str(column) + " " + str(row) + " at " + str(grid))
 				self.members[i].addElements(grid,column,row,self.languageData.getOption(self.textLanguageOptions[8]))
 				i = i + 1
 
@@ -373,31 +389,49 @@ class HoloStream(QMainWindow):
 			else:
 				i = i + 1
 
-	def setSortToMain(self):
-		
-		#self.config['sort'] = "main"
+	# def setSortToMain(self):
 
-		self.Mainconfig.setOption('sort','main')
+	# 	self.sort = "main"
 		
-		self.Mainconfig.saveConfig(self.resource_path(self.configpath))
+	# 	self.mainlayout.setCurrentIndex(0)
+
+	# 	self.updateLiveStatus()
 		
-		self.displayMessage(QMessageBox.Warning,self.languageData.getOption(self.textLanguageOptions[11]),"","Info","")
+	# 	#self.config['sort'] = "main"
+
+	# 	# self.Mainconfig.setOption('sort','main')
 		
-	def setSortToID(self):
+	# 	# self.Mainconfig.saveConfig(self.resource_path(self.configpath))
 		
-		self.Mainconfig.setOption('sort','ID')
+	# 	# self.displayMessage(QMessageBox.Warning,self.languageData.getOption(self.textLanguageOptions[11]),"","Info","")
 		
-		self.Mainconfig.saveConfig(self.resource_path(self.configpath))
+	# def setSortToID(self):
+
+	# 	self.sort = "ID"
+
+	# 	self.mainlayout.setCurrentIndex(1)
+
+	# 	self.updateLiveStatus()
 		
-		self.displayMessage(QMessageBox.Warning,self.languageData.getOption(self.textLanguageOptions[11]),"","Info","")
+	# 	# self.Mainconfig.setOption('sort','ID')
 		
-	def setSortToStars(self):
+	# 	# self.Mainconfig.saveConfig(self.resource_path(self.configpath))
 		
-		self.Mainconfig.setOption('sort','Stars')
+	# 	# self.displayMessage(QMessageBox.Warning,self.languageData.getOption(self.textLanguageOptions[11]),"","Info","")
 		
-		self.Mainconfig.saveConfig(self.resource_path(self.configpath))
+	# def setSortToStars(self):
+
+	# 	self.sort = "Stars"
 		
-		self.displayMessage(QMessageBox.Warning,self.languageData.getOption(self.textLanguageOptions[11]),"","Info","")
+	# 	self.mainlayout.setCurrentIndex(2)
+
+	# 	self.updateLiveStatus()
+
+	# 	# self.Mainconfig.setOption('sort','Stars')
+		
+	# 	# self.Mainconfig.saveConfig(self.resource_path(self.configpath))
+		
+	# 	# self.displayMessage(QMessageBox.Warning,self.languageData.getOption(self.textLanguageOptions[11]),"","Info","")
 		
 	def displayMessage(self,icon,text,informative_text,title,detailed_text):
 		
@@ -413,7 +447,7 @@ class HoloStream(QMainWindow):
 	def updateLiveStatus(self):
 		for i in range(len(self.members)):
 			
-			t = threading.Thread(target=self.members[i].check_live, args=(self.Mainconfig.getOption('sort'),self.languageData.getOption(self.textLanguageOptions[8]),self.languageData.getOption(self.textLanguageOptions[9])))
+			t = threading.Thread(target=self.members[i].check_live, args=(self.languageData.getOption(self.textLanguageOptions[8]),self.languageData.getOption(self.textLanguageOptions[9])))
 			t.start()
 
 	def loadMembers(self):
