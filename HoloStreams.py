@@ -87,10 +87,11 @@ class HoloLiveMember():
 						self.updateLiveStatus(offline, live)
 						print(self.name + " is online: " + str(self.isLive))
 						return
+		else:
+			self.isLive = False
+			print(self.name + " is offline")
 			
-		#self.isLive = False
 		self.updateLiveStatus(offline, live)
-		print(self.name + " is online: " + str(self.isLive))
 		#else:
 		#	pass
 			
