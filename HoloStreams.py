@@ -330,14 +330,14 @@ class HoloStream(QMainWindow):
 	def setLanguageToJapanese(self):
 
 		self.Mainconfig.setOption('language','ja_JP')
-		self.languageData.saveConfig(self.resource_path(self.languagepath))
+		self.Mainconfig.saveConfig(self.resource_path(self.configpath))
 
 		self.displayMessage(QMessageBox.Warning,self.languageData.getOption(self.textLanguageOptions[11]),"","Info","")
 
 	def setLanguageToEnglish(self):
 
 		self.Mainconfig.setOption('language','en_US')
-		self.languageData.saveConfig(self.resource_path(self.languagepath))
+		self.Mainconfig.saveConfig(self.resource_path(self.configpath))
 		
 		self.displayMessage(QMessageBox.Warning,self.languageData.getOption(self.textLanguageOptions[11]),"","Info","")
 
