@@ -19,7 +19,7 @@ from PyQt5.QtGui import QIcon, QPixmap
 
 class HoloLiveMember():
 
-	def __init__(self, name, channel_id, devision, isLive,photopath,branch):
+	def __init__(self, name=None, channel_id=None, devision=None, isLive=None,photopath=None,branch=None):
 		self.devision = devision
 		self.channel_id = channel_id
 		self.name = name
@@ -35,12 +35,14 @@ class HoloLiveMember():
 
 		self.containerBox = QHBoxLayout() #layout so that the pfp a button are right next to eachother
 
-		self.pfplabel = QLabel()
-		Pixmap = QPixmap(self.photoPath)
-		newPixmap = Pixmap.scaled(64, 64, Qt.KeepAspectRatio)
-		self.pfplabel.setPixmap(newPixmap)
-		self.pfplabel.resize(64,64)
-		self.containerBox.addWidget(self.pfplabel)
+		# self.pfplabel = QLabel()
+		# Pixmap = QPixmap(self.photoPath)
+		# newPixmap = Pixmap.scaled(64, 64, Qt.KeepAspectRatio)
+		# self.pfplabel.setPixmap(newPixmap)
+		# self.pfplabel.resize(64,64)
+		# self.containerBox.addWidget(self.pfplabel)
+
+		self.containerBox.addWidget(QLabel(self.name))
 		
 		self.containerBox.addStretch()
 
