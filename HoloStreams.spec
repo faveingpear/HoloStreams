@@ -7,7 +7,6 @@ a = Analysis(['HoloStreams.py'],
              pathex=['/home/faveing/Documents/Projects/HoloStreams/HoloStreams'],
              binaries=[],
              datas=[
-				('images/*','images'),
 				('members.json', '.'),
 				('config.json','.'),
         ('lang/*','lang')

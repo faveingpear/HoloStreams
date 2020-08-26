@@ -45,7 +45,7 @@
  [],
  False,
  False,
- 1598077369,
+ 1598143599,
  [('run',
    '/home/faveing/.local/lib/python3.8/site-packages/PyInstaller/bootloader/Linux-64bit/run',
    'EXECUTABLE')])

@@ -7,7 +7,9 @@ import time
 import json
 import yaml
 import json
+
 # Website Parsing
+import urllib
 import webbrowser
 import requests
 import threading
@@ -35,15 +37,24 @@ class HoloLiveMember():
 
 		self.containerBox = QHBoxLayout() #layout so that the pfp a button are right next to eachother
 
-		# self.pfplabel = QLabel()
-		# Pixmap = QPixmap(self.photoPath)
-		# newPixmap = Pixmap.scaled(64, 64, Qt.KeepAspectRatio)
-		# self.pfplabel.setPixmap(newPixmap)
-		# self.pfplabel.resize(64,64)
-		# self.containerBox.addWidget(self.pfplabel)
-
 		self.containerBox.addWidget(QLabel(self.name))
-		
+
+		# Will fix later
+
+		# if(self.photoPath == None):
+		# 	self.containerBox.addWidget(QLabel(self.name))
+		# else:
+		# 	url = self.photoPath    
+		# 	data = urllib.urlopen(url).read()
+
+		# 	self.pfplabel = QLabel()
+		# 	Pixmap = QPixmap(self.photoPath)
+		# 	newPixmap = Pixmap.loadFromData(data)
+		# 	#newPixmap = Pixmap.scaled(64, 64, Qt.KeepAspectRatio)
+		# 	self.pfplabel.setPixmap(newPixmap)
+		# 	self.pfplabel.resize(64,64)
+		# 	self.containerBox.addWidget(self.pfplabel)
+
 		self.containerBox.addStretch()
 
 		self.livebutton = QPushButton()
@@ -161,14 +172,6 @@ class Config:
 		print("Inputed options" + str(listOfOptions))
 		print("Retrevied Data" + str(self.configData))
 
-		# for option in listOfOptions:
-
-		# 	self.configs[option].append(self.configData[option])
-
-		# 	print("Added option " + str(option) + " with value " + str(self.configs[option]) + " to " + self.name)
-
-		# print("New Data: " + str(self.configs))
-
 	def getOption(self, option):
 
 		return self.configData[option]
@@ -249,29 +252,6 @@ class HoloStream(QMainWindow):
 		menubar = self.menuBar()
 		filemenu = menubar.addMenu(self.languageData.getOption(self.textLanguageOptions[1]))
 		filemenu.addAction(quitAction)
-		
-		# mainbranchAction = QAction(self.languageData.getOption(self.textLanguageOptions[4]),self)
-		# mainbranchAction.setShortcut("Ctrl+m")
-		# mainbranchAction.triggered.connect(self.setSortToMain)
-		
-		# IDbranchAction = QAction(self.languageData.getOption(self.textLanguageOptions[5]),self)
-		# IDbranchAction.setShortcut("Ctrl+i")
-		# IDbranchAction.triggered.connect(self.setSortToID)
-		
-		# holoStarsbranchAction = QAction(self.languageData.getOption(self.textLanguageOptions[6]),self)
-		# holoStarsbranchAction.setShortcut("Ctrl+s")
-		# holoStarsbranchAction.triggered.connect(self.setSortToStars)
-		
-		# Will turn into china but I have no way of chekcing the live status yet
-		#mainbranchAction = QAction("Main",self) 
-		#mainbranchAction.setShortcut("Ctrl-m")
-		#mainbranchAction.triggered.connect(self.setSortToMain)
-		
-		# No need since I swithed to tabed ui although If I ever add nijisanji I will add a menu like this
-		# holomenu = menubar.addMenu(self.languageData.getOption(self.textLanguageOptions[0]))
-		# holomenu.addAction(mainbranchAction)
-		# holomenu.addAction(IDbranchAction)
-		# holomenu.addAction(holoStarsbranchAction)
 
 		englishAction = QAction("English",self)
 		englishAction.setShortcut("Ctrl-e")
@@ -345,35 +325,6 @@ class HoloStream(QMainWindow):
 
 	def displayMembers(self,sort,grid):
 
-		# for i in range(len(self.members)):
-		# 	if self.members[i].branch == self.Mainconfig.getOption('sort'):
-				
-		# 		if row > max_per_column:
-		# 			row = 0
-		# 			left_margin = left_margin + 200
-		# 			top_margin  = 20
-					
-		# 		self.members[i].addElements(grid,left_margin,top_margin,self.languageData.getOption(self.textLanguageOptions[8]))
-				
-		# 		top_margin = top_margin  + 80
-				
-		# 		row = row + 1
-				
-		# 	else:
-		# 		pass	
-		
-		# i = 0
-		# for x in range(rows):
-		# 	for y in range(columns):
-		# 		print(self.members[i].name)
-		# 		if self.members[i].branch == self.Mainconfig.getOption('sort'):
-		# 			self.members[i].addElements(grid,x,y,self.languageData.getOption(self.textLanguageOptions[8]))
-		# 			i = i + 1
-		# 		else:
-		# 			x = x - 1
-		# 			y = y - 1
-		# 			i = i + 1
-
 		column = 1
 		row = 1
 		max_row = 5
@@ -391,50 +342,6 @@ class HoloStream(QMainWindow):
 				row = row + 1
 			else:
 				i = i + 1
-
-	# def setSortToMain(self):
-
-	# 	self.sort = "main"
-		
-	# 	self.mainlayout.setCurrentIndex(0)
-
-	# 	self.updateLiveStatus()
-		
-	# 	#self.config['sort'] = "main"
-
-	# 	# self.Mainconfig.setOption('sort','main')
-		
-	# 	# self.Mainconfig.saveConfig(self.resource_path(self.configpath))
-		
-	# 	# self.displayMessage(QMessageBox.Warning,self.languageData.getOption(self.textLanguageOptions[11]),"","Info","")
-		
-	# def setSortToID(self):
-
-	# 	self.sort = "ID"
-
-	# 	self.mainlayout.setCurrentIndex(1)
-
-	# 	self.updateLiveStatus()
-		
-	# 	# self.Mainconfig.setOption('sort','ID')
-		
-	# 	# self.Mainconfig.saveConfig(self.resource_path(self.configpath))
-		
-	# 	# self.displayMessage(QMessageBox.Warning,self.languageData.getOption(self.textLanguageOptions[11]),"","Info","")
-		
-	# def setSortToStars(self):
-
-	# 	self.sort = "Stars"
-		
-	# 	self.mainlayout.setCurrentIndex(2)
-
-	# 	self.updateLiveStatus()
-
-	# 	# self.Mainconfig.setOption('sort','Stars')
-		
-	# 	# self.Mainconfig.saveConfig(self.resource_path(self.configpath))
-		
-	# 	# self.displayMessage(QMessageBox.Warning,self.languageData.getOption(self.textLanguageOptions[11]),"","Info","")
 		
 	def displayMessage(self,icon,text,informative_text,title,detailed_text):
 		
